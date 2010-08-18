@@ -1,0 +1,11 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=3210
+
+Actually most types of brackets are supported, as long it works with %. This script aims to provide some useful tricks of ParEdit but be less restrictive and more geared towards C-style programming rather than Lisp. It has less than 5% of ParEdit probably, if you want something more similar, look for slimev.
+
+This makes the open brackets (, [, and < introduce a balanced pair. If there is already an unbalance, the script determines if adding a closing bracket makes matters better or worse. In the latter case, the closing bracket is not added.
+
+Typing the close bracket checks if the next non-whitespace character is already that same symbol. If it is, the script just zaps all white-space until the existing symbol and moves past it. If there is no closing symbol, a new closing bracket is introduced. (Note that is much less restrictive than ParEdit but also much less safe).
+
+For { a special case exists: typing a second { in a row introduces extra newlines for C-style programming rather than a nested pair of curly brackets. Also, } doesn't remove all white-space like the other brackets do. Again, this is convenient for programming.
+
+In normal mode, you can type a number N and then an opening bracket, and the script will put brackets around the following N words, similar to what you can do in ParEdit.

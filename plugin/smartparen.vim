@@ -10,7 +10,7 @@
 " Name Of File: smartparens.vim
 "  Description: Smart Behavior of Parentheses (ParEdit ultra-light)
 "   Maintainer: Niels Aan de Brugh (nielsadb+vim at gmail dot com)
-" Last Changed: 18 Aug 2010
+" Last Changed: 25 Aug 2010
 "      Version: See g:smartparens_version for version number.
 "        Usage: This file should reside in the plugin directory and be
 "               automatically sourced.
@@ -19,7 +19,15 @@
 if exists("g:smartparens_version") || &cp
     finish
 endif
-let g:smartparens_version = "0.1"
+let g:smartparens_version = "0.2"
+
+if !exists("g:smartparens_exclude")
+    let g:smartparens_exclude = ">"
+endif
+
+if !exists("g:smartparens_escape")
+    let g:smartparens_escape = "`"
+endif
 
 function! s:NextCharIs(ch)
     let l:origPos = getpos(".")
@@ -149,20 +157,41 @@ function! PutBrackets(open, close)
     end
 endfunction
 
-function! RemapParensForBuffer()
-    inoremap <buffer> ( <C-o>:call OpenBracket("(", ")")<CR>
-    inoremap <buffer> ) <C-o>:call CloseBracket(")")<CR>
-    inoremap <buffer> [ <C-o>:call OpenBracket("[", "]")<CR>
-    inoremap <buffer> ] <C-o>:call CloseBracket("]")<CR>
-    inoremap <buffer> < <C-o>:call OpenBracket("<", ">")<CR>
-    inoremap <buffer> > <C-o>:call CloseBracket(">")<CR>
-    inoremap <buffer> { <C-o>:call OpenCurlyBracket()<CR>
-    inoremap <buffer> } <C-o>:call CloseCurlyBracket()<CR>
+function! s:DefineEscapedMapping(brackets)
+    for bracket in a:brackets
+        exe "inoremap <buffer> ".g:smartparens_escape.bracket." ".bracket
+    endfor
+endfunction
 
-    nnoremap <buffer> ( :<C-u>call PutBrackets("(", ")")<CR>
-    nnoremap <buffer> [ :<C-u>call PutBrackets("[", "]")<CR>
-    nnoremap <buffer> < :<C-u>call PutBrackets("<", ">")<CR>
-    nnoremap <buffer> { :<C-u>call PutBrackets("{", "}")<CR>
+function! RemapParensForBuffer()
+    if stridx(g:smartparens_exclude, "(") == -1 && stridx(&matchpairs, "(:)") != -1
+        call s:DefineEscapedMapping(["(", ")"])
+        inoremap <buffer> ) <C-o>:call CloseBracket(")")<CR>
+        inoremap <buffer> ( <C-o>:call OpenBracket("(", ")")<CR>
+        inoremap <buffer> ) <C-o>:call CloseBracket(")")<CR>
+        nnoremap <buffer> ( :<C-u>call PutBrackets("(", ")")<CR>
+    endif
+
+    if stridx(g:smartparens_exclude, "[") == -1 && stridx(&matchpairs, "[:]") != -1
+        call s:DefineEscapedMapping(["[", "]"])
+        inoremap <buffer> [ <C-o>:call OpenBracket("[", "]")<CR>
+        inoremap <buffer> ] <C-o>:call CloseBracket("]")<CR>
+        nnoremap <buffer> [ :<C-u>call PutBrackets("[", "]")<CR>
+    endif
+
+    if stridx(g:smartparens_exclude, "<") == -1 && stridx(&matchpairs, "<:>") != -1
+        call s:DefineEscapedMapping(["<", ">"])
+        inoremap <buffer> < <C-o>:call OpenBracket("<", ">")<CR>
+        inoremap <buffer> > <C-o>:call CloseBracket(">")<CR>
+        nnoremap <buffer> < :<C-u>call PutBrackets("<", ">")<CR>
+    endif
+
+    if stridx(g:smartparens_exclude, "{") == -1 && stridx(&matchpairs, "{:}") != -1
+        call s:DefineEscapedMapping(["{", "}"])
+        inoremap <buffer> { <C-o>:call OpenCurlyBracket()<CR>
+        inoremap <buffer> } <C-o>:call CloseCurlyBracket()<CR>
+        nnoremap <buffer> { :<C-u>call PutBrackets("{", "}")<CR>
+    endif
 endfunction
 
 
